@@ -1,20 +1,4 @@
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#define PATH_HTDOCS "/Users/kanta/Desktop/RDocument/AdvancedProgramming/htdocs"
-
-void path_create(char *buf, char *path_name);
-void space_divide(char *http_status[], char *buf);
-int path_status(char *path_name);
+#include "header.h"
 
 void error_check(int err, char target[]) {
   if (err < 0) {
