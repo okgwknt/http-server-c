@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
   if (argc != 2) {
     return 1;
   }
+
   int dsocket;
   dsocket = socket(AF_INET, SOCK_STREAM, 0);
   error_check(dsocket, "socket");
@@ -21,8 +22,7 @@ int main(int argc, char *argv[]) {
   server_addr.sin_family = AF_INET;
   int port = (int)strtol(argv[1], NULL, 10);
   server_addr.sin_port = htons(port);
-  // server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-  server_addr.sin_addr.s_addr = INADDR_ANY;
+  server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
   struct sockaddr_in client_addr;
   int sock_len = sizeof(client_addr);
