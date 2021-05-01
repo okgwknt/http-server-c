@@ -15,8 +15,12 @@
 
 #define PATH_HTDOCS "../htdocs"
 
-void path_create(char *buf, char *path_name);
-void space_divide(char *http_status[], char *buf);
+void receive_request(char *http_request, int sock);
+
+void generate_response(char *http_request, char *path_name);
+void divide_space(char *http_status[], char *buf);
 int path_status(char *path_name);
+
+void send_response(char *path_name, int sock);
 
 #endif
