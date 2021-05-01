@@ -6,16 +6,18 @@ void send_response(char *path_name, int sock) {
   char success[] = "HTTP/1.1 200 OK\r\n";
   char fail[] = "HTTP/1.1 404 Not Found\r\n";
   if (file_d >= 0) {
-    write(sock, success, strlen(success) + 1);
+    write(sock, success, strlen(success));
+    puts("send success");
   }
   if (file_d < 0) {
-    write(sock, fail, strlen(fail) + 1);
+    write(sock, fail, strlen(fail));
+    puts("send fail");
   }
   char crlf[] = "\r\n";
   write(sock, crlf, strlen(crlf));
 
   while (1) {
-    char http_response[4096];
+    char http_response[1024];
     int fd_read = read(file_d, http_response, sizeof(http_response));
     if (fd_read <= 0) {
       break;
