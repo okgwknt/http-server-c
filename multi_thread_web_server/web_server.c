@@ -1,20 +1,4 @@
-#include <arpa/inet.h>
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <pthread.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#define PATH_HTDOCS "../htdocs"
+#include "header.h"
 
 void path_create(char *buf, char *path_name);
 void space_divide(char *http_status[], char *buf);
@@ -39,8 +23,8 @@ int main(int argc, char const *argv[]) {
   server_addr.sin_family = AF_INET;
   int port = (int)strtol(argv[1], NULL, 10);
   server_addr.sin_port = htons(port);
-  // server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-  server_addr.sin_addr.s_addr = INADDR_ANY;
+  server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+  // server_addr.sin_addr.s_addr = INADDR_ANY;
 
   int b_err =
       bind(dsocket, (struct sockaddr *)&server_addr, sizeof(server_addr));

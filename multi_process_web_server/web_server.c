@@ -1,24 +1,5 @@
-#include <arpa/inet.h>
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include "header.h"
 
-#define PATH_HTDOCS "/Users/kanta/Desktop/RDocument/AdvancedProgramming/htdocs"
-
-void path_create(char *buf, char *path_name);
-void space_divide(char *http_status[], char *buf);
-int path_status(char *path_name);
 void error_check(int err, char target[]) {
   if (err < 0) {
     perror(target);
@@ -30,6 +11,7 @@ void signal_sigchld(int sig) {
   int status;
   while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
     if (WIFEXITED(status) != 0) {
+      puts("------------------------------------------------");
       printf("finish PID: %d\n", pid);
       return;
     }
@@ -69,7 +51,7 @@ int main(int argc, char const *argv[]) {
 
   while (1) {
 
-    puts("--------------------------------------------------------------");
+    puts("------------------------------------------------");
 
     // accept http request
     int sock = accept(dsocket, (struct sockaddr *)&client_addr, &sock_len);
@@ -86,61 +68,24 @@ int main(int argc, char const *argv[]) {
     // child
     if (pid == 0) {
 
-      puts("************************HTTP REREQUEST************************");
       // リクエストのread
       char http_request[2048];
-      memset(http_request, 0, sizeof(http_request));
-      int read_count = read(sock, http_request, sizeof(http_request));
-      if (read_count < 0) {
-        perror("read");
-        exit(EXIT_FAILURE);
-      }
+      receive_request(http_request, sock);
+
       // レスポンスの動作
       // PATH
       char path_name[256] = PATH_HTDOCS;
 
-      path_create(http_request, path_name);
-      // パスの一番後ろは / なしになっているはず
+      generate_response(http_request, path_name);
+
       printf("request pathname: %s\n", path_name);
 
-      int check = path_status(path_name);
+      send_response(path_name, sock);
 
-      if (check == 1) {
-        char index_html[16] = "/index.html";
-        strncat(path_name, index_html, 16);
-      }
-
-      int file_d = open(path_name, O_RDONLY);
-
-      char success[] = "HTTP/1.1 200 OK\r\n";
-      char fail[] = "HTTP/1.1 404 Not Found\r\n";
-      if (file_d >= 0) {
-        write(sock, success, strlen(success));
-      }
-      if (file_d < 0) {
-        write(sock, fail, 25);
-      }
-      char crlf[] = "\r\n";
-      write(sock, crlf, strlen(crlf));
-
-      while (1) {
-        char http_response[4096];
-        // memset(http_response, 0, sizeof(http_response));
-        int fd_read = read(file_d, http_response, sizeof(http_response));
-        if (fd_read <= 0) {
-          break;
-        }
-        int w_err = write(sock, http_response, fd_read);
-        if (w_err < 1) {
-          perror("write");
-          exit(EXIT_FAILURE);
-        }
-      }
-      close(file_d);
       // finish connection
       close(sock);
       close(dsocket);
-      // sleep(2);
+
       exit(EXIT_SUCCESS);
     }
 
@@ -149,7 +94,6 @@ int main(int argc, char const *argv[]) {
       printf("PID: %d\n", pid);
       close(sock);
     }
-    puts("--------------------------------------------------------------");
   }
   /* listen するsocketの終了 */
   if (close(dsocket) == -1) {
@@ -157,56 +101,4 @@ int main(int argc, char const *argv[]) {
     exit(EXIT_FAILURE);
   }
   return 1;
-}
-void path_create(char *buf, char *path_name) {
-  // パスを分析
-  char line[64];
-  sscanf(buf, "%[^\n]", line);
-  fpurge(stdin);
-  char *http_status[3];
-  space_divide(http_status, line);
-  strncat(path_name, http_status[1], 128);
-
-  int path_last = strlen(path_name);
-  if (path_name[path_last - 1] == '/') {
-    path_name[path_last - 1] = '\0';
-  }
-}
-
-void space_divide(char *http_status[], char *buf) {
-  int i;
-
-  for (i = 0; *buf != '\0'; i++) {
-    while (*buf == ' ') {
-      *buf = '\0';
-      buf++;
-    }
-
-    if (*buf == '\0') {
-      break;
-    }
-    http_status[i] = buf;
-    while (*buf != '\0' && *buf != ' ') {
-      buf++;
-    }
-  }
-
-  http_status[i] = 0;
-}
-int path_status(char *path_name) {
-  // ファイルかディレクトリかを確認する
-  struct stat status_path;
-  if (stat(path_name, &status_path) == -1) {
-    perror("stat");
-    exit(EXIT_FAILURE);
-  }
-  // ディレクトリの時
-  if (S_ISDIR(status_path.st_mode)) {
-    return 1;
-  }
-  // ファイルの時
-  if (S_ISREG(status_path.st_mode)) {
-    return 0;
-  }
-  return 0;
 }
