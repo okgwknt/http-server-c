@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     puts("-----------------------------------------------------");
 
-    char http_request[1024];
+    char http_request[50000];
 
     receive_request(http_request, sock);
 
