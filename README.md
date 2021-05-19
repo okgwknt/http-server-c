@@ -1,4 +1,4 @@
-# web-server-c
+# http-server-c
 
 multi thread は未完成
 
