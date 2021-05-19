@@ -1,6 +1,6 @@
 # web-server-c
 
-multi thread は未完
+multi thread は未完成
 
 ## Description
 
