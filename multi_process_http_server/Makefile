@@ -1,4 +1,4 @@
-PROGRAM = web_server
+PROGRAM = http_server
 OBJS = generate_response.o send_response.o receive_request.o
 CC = gcc
 CFLAGS = -O2
