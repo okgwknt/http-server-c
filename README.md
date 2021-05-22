@@ -33,7 +33,7 @@ make
 build したあとは
 
 ```zsh
-./web_server [port番号]
+./http_server [port番号]
 ```
 
 でサーバを起動することができます．
