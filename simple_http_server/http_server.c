@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 
     char http_request[50000];
 
-    receive_request(http_request, sock);
+    request_handler(http_request, sock);
 
     // レスポンスの動作
     char path_name[256] = PATH_HTDOCS;
