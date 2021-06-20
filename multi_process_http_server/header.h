@@ -19,7 +19,7 @@
 
 #define PATH_HTDOCS "../htdocs"
 
-void receive_request(char *http_request, int sock);
+void request_handler(char *http_request, int sock);
 
 void generate_response(char *http_request, char *path_name);
 void divide_space(char *http_status[], char *buf);

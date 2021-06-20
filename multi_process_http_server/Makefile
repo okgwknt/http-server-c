@@ -1,5 +1,5 @@
 PROGRAM = http_server
-OBJS = generate_response.o send_response.o receive_request.o
+OBJS = generate_response.o send_response.o request_handler.o
 CC = gcc
 CFLAGS = -O2
 

@@ -19,6 +19,16 @@
 
 #define PATH_HTDOCS "../htdocs"
 
+void request_handler(char *http_request, int sock);
+
+void generate_response(char *http_request, char *path_name);
+void divide_space(char *http_status[], char *buf);
+int path_status(char *path_name);
+
+void send_response(char *path_name, int sock);
+
+void thread_func(void);
+
 // void receive_request(char *http_request, int sock);
 
 // void generate_response(char *http_request, char *path_name);

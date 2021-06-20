@@ -70,7 +70,7 @@ int main(int argc, char const *argv[]) {
 
       // リクエストのread
       char http_request[2048];
-      receive_request(http_request, sock);
+      request_handler(http_request, sock);
 
       // レスポンスの動作
       // PATH
