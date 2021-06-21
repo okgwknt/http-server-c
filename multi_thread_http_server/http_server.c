@@ -7,8 +7,9 @@ void error_check(int err, char target[]) {
   }
 }
 
-// int sock;
-// int sock0;
+int dsocket;
+struct sockaddr_in client_addr;
+int sock_len;
 
 int main(int argc, char const *argv[]) {
 
@@ -16,7 +17,7 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  int dsocket;
+  // int dsocket;
   dsocket = socket(AF_INET, SOCK_STREAM, 0);
   error_check(dsocket, "socket");
 
@@ -30,8 +31,7 @@ int main(int argc, char const *argv[]) {
   // server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
   server_addr.sin_addr.s_addr = INADDR_ANY;
 
-  struct sockaddr_in client_addr;
-  int sock_len = sizeof(client_addr);
+  sock_len = sizeof(client_addr);
 
   int b_err =
       bind(dsocket, (struct sockaddr *)&server_addr, sizeof(server_addr));
@@ -40,72 +40,53 @@ int main(int argc, char const *argv[]) {
   int l_err = listen(dsocket, 1);
   error_check(l_err, "listen");
 
-  /*
+  pthread_t thread[4];
+  int ret[4];
 
+  for (int i = 0; i < 4; i++) {
+    char number[] = "";
+    ret[i] = pthread_create(&thread[i], NULL, (void *)thread_func, NULL);
+    if (ret[i] != 0) {
+      perror("thread");
+      exit(EXIT_FAILURE);
+    }
+  }
 
-    スレッド処理をやります
-
-
-  */
-
-  // pthread_t *thread0 = (pthread_t *)malloc(sizeof(pthread_t));
-  // pthread_t *thread1 = (pthread_t *)malloc(sizeof(pthread_t));
-  // pthread_t *thread2 = (pthread_t *)malloc(sizeof(pthread_t));
-  // pthread_t *thread3 = (pthread_t *)malloc(sizeof(pthread_t));
-  // not pointa
-  // pthread_t thread0;
-  // pthread_t thread1;
-  // pthread_t thread2;
-  // pthread_t thread3;
-  // int ret[4] = {0, 0, 0, 0};
-  // ret[0] = pthread_create(&thread0, NULL, (void *)thread_func, NULL);
-  // ret[1] = pthread_create(&thread1, NULL, (void *)thread_func, NULL);
-  // ret[2] = pthread_create(&thread2, NULL, (void *)thread_func, NULL);
-  // ret[3] = pthread_create(&thread3, NULL, (void *)thread_func, NULL);
-
-  // エラー処理
-  // if (ret[0] != 0) {
-  //   perror("thread0");
-  //   exit(EXIT_FAILURE);
-  // }
-  // if (ret[1] != 0) {
-  //   perror("thread1");
-  //   exit(EXIT_FAILURE);
-  // }
-  // if (ret[2] != 0) {
-  //   perror("thread2");
-  //   exit(EXIT_FAILURE);
-  // }
-  // if (ret[3] != 0) {
-  //   perror("thread3");
-  //   exit(EXIT_FAILURE);
-  // }
-
-  // // 変換した後の情報を捨てる
-  // ret[0] = pthread_detach(thread0);
+  // 変換した後の情報を捨てる
+  // ret[0] = pthread_detach(thread[0]);
   // if (ret[0] != 0) {
   //   perror("thread0");
   // }
-  // free(thread0);
-  // ret[1] = pthread_detach(thread1);
+  // // free(thread[0]);
+  // ret[1] = pthread_detach(thread[1]);
   // if (ret[1] != 0) {
   //   perror("thread1");
   // }
-  // free(thread1);
-  // ret[2] = pthread_detach(thread2);
+  // // free(thread[1]);
+  // ret[2] = pthread_detach(thread[2]);
   // if (ret[2] != 0) {
   //   perror("thread2");
   // }
-  // free(thread2);
-  // ret[3] = pthread_detach(thread3);
+  // // free(thread[2]);
+  // ret[3] = pthread_detach(thread[3]);
   // if (ret[3] != 0) {
   //   perror("thread3");
   // }
-  // free(thread3);
+  // free(thread[3]);
 
+  puts("Thread");
+  pthread_exit(NULL);
   return 1;
 }
+
 void thread_func(void) {
+
+  int error = pthread_detach(pthread_self());
+  if (error < 0) {
+    exit(EXIT_FAILURE);
+  }
+
+  printf("Thread ID: %d\n", pthread_self());
 
   while (1) {
 
@@ -113,9 +94,9 @@ void thread_func(void) {
     int sock = accept(dsocket, (struct sockaddr *)&client_addr, &sock_len);
     error_check(sock, "accept");
 
-    puts("Connected");
-
     puts("-----------------------------------------------------");
+
+    printf("Connected Thread ID: %d\n", pthread_self());
 
     char http_request[50000];
 
@@ -134,8 +115,8 @@ void thread_func(void) {
     close(sock);
   }
   /* listen するsocketの終了 */
-  if (close(sock0) == -1) {
-    perror("close");
-    exit(EXIT_FAILURE);
-  }
+  int c_err = close(dsocket);
+  error_check(c_err, "close");
+
+  return;
 }

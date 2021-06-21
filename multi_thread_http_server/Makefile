@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -O2
 
 $(PROGRAM): $(PROGRAM).o $(OBJS)
-	$(CC) -o $(PROGRAM) $(PROGRAM).o $(OBJS) 
+	$(CC) -o $(PROGRAM) $(PROGRAM).o $(OBJS) -lpthread
 
 $(OBJS) $(PROGRAM).o: header.h
 
